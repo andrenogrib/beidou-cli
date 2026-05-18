@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//e/LocalGit/GitHub/BeiDou-Server/**)",
+      "Read(//e/LocalGit/GitHub/beidou-server/**)",
+      "Bash(mvn compile *)",
+      "Bash(mvn package *)",
+      "Bash(java -jar target/beidou-1.0-SNAPSHOT.jar --help)",
+      "Bash(java -jar target/beidou-1.0-SNAPSHOT.jar config --help)",
+      "Bash(java -jar target/beidou-1.0-SNAPSHOT.jar call --help)",
+      "Bash(java -version)",
+      "Bash(native-image --version)",
+      "Bash(export JAVA_HOME=\"D:/Program Files/Java/graalvm-jdk-21.0.11+9.1\")",
+      "Bash(export PATH=\"$JAVA_HOME/bin:$PATH\")",
+      "Bash(D:/Program Files/Java/graalvm-jdk-21.0.11+9.1/bin/java *)",
+      "Read(//d/Program Files/Java/graalvm-jdk-21.0.11+9.1/bin/**)",
+      "Read(//d/Program Files/Java/graalvm-jdk-21.0.11+9.1/lib/svm/bin/**)",
+      "Bash(export PATH=\"$JAVA_HOME/bin:$JAVA_HOME/lib/svm/bin:$PATH\")",
+      "Bash(wsl --status)",
+      "Bash(wsl -l -v)",
+      "Bash(gcc --version)",
+      "Bash(clang --version)",
+      "Bash(cc --version)"
+    ]
+  },
+  "enabledPlugins": {
+    "superpowers@claude-plugins-official": true
+  }
+}
