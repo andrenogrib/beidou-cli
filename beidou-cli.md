@@ -1,11 +1,13 @@
 ---
 name: beidou-cli
-description: Use the beidou CLI to interact with BeiDou-Server via HTTP API.
+description: Use the beidou CLI to interact with BeiDou-Server via HTTP API. ALWAYS use `beidou batch` for 2+ API calls — never make multiple individual `beidou call` commands.
 ---
 
 # beidou CLI Guide
 
 `beidou` is a CLI tool for managing BeiDou-Server through HTTP API.
+
+**GOLDEN RULE: When you need 2 or more API calls, combine them with `echo '...' | beidou batch`. Each separate `beidou call` triggers its own permission prompt. Batch = one prompt for all.**
 
 ## If `beidou` Is Not Installed
 
@@ -13,18 +15,20 @@ Check by running `beidou version`. If the command is not found, install with the
 
 **Windows (PowerShell):**
 ```powershell
-# 直连 GitHub
-irm https://raw.githubusercontent.com/BeiDouMS/beidou-cli/master/install.ps1 | iex
-# 或通过 ghproxy 代理加速
 irm https://raw.githubusercontent.com/BeiDouMS/beidou-cli/master/install-cn.ps1 | iex
+```
+If the mirror is unavailable, fall back to:
+```powershell
+irm https://raw.githubusercontent.com/BeiDouMS/beidou-cli/master/install.ps1 | iex
 ```
 
 **macOS / Linux:**
 ```bash
-# 直连 GitHub
-curl -fsSL https://raw.githubusercontent.com/BeiDouMS/beidou-cli/master/install.sh | bash
-# 或通过 ghproxy 代理加速
 curl -fsSL https://raw.githubusercontent.com/BeiDouMS/beidou-cli/master/install-cn.sh | bash
+```
+If the mirror is unavailable, fall back to:
+```bash
+curl -fsSL https://raw.githubusercontent.com/BeiDouMS/beidou-cli/master/install.sh | bash
 ```
 
 The script handles download, PATH setup, and platform detection automatically. After install, restart the terminal or reload PATH.
@@ -85,7 +89,20 @@ Each entry shows: HTTP method, path, description, and `[敏感]` marker if it ne
 
 ### 3. Call APIs
 
-**Single request:**
+**CRITICAL: When you need 2 or more API calls, you MUST use `beidou batch`. Each `beidou call` is a separate shell invocation that triggers its own permission prompt. Batching combines all calls into ONE shell command — one permission, one wait.**
+
+**Batch multiple requests (default for >1 call):**
+```bash
+echo '
+GET /server/v1/online
+GET /server/v1/version
+POST /character/v1/online/list {"pageNum":1,"pageSize":5}
+POST /drop/v1/getDropList {"pageNum":1,"pageSize":200}
+' | beidou batch
+```
+All results are printed together. Sensitive operations still work in batch by prefixing the line with `--force`.
+
+**Single request (only when you truly need just ONE call):**
 ```bash
 beidou call GET /server/v1/online
 beidou call POST /character/v1/online/list '{"pageNum":1,"pageSize":10}'
@@ -94,19 +111,6 @@ beidou call POST /character/v1/online/list '{"pageNum":1,"pageSize":10}'
 **Sensitive operations** (shutdown, delete, modify data) require `--force`:
 ```bash
 beidou call --force GET /server/v1/shutdown
-```
-
-**Multiple requests together** (preferred for AI agents — one shell call, one permission prompt):
-```bash
-# Method A: pipe to batch (cleanest)
-echo '
-GET /server/v1/online
-GET /server/v1/version
-POST /character/v1/online/list {"pageNum":1,"pageSize":5}
-' | beidou batch
-
-# Method B: && chain
-beidou call GET /server/v1/online && beidou call GET /server/v1/version
 ```
 
 ## Maintaining the CLI

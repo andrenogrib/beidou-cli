@@ -19,13 +19,13 @@ import java.util.concurrent.Callable;
         versionProvider = Main.VersionProvider.class,
         description = "BeiDou-Server 游戏服务端管理工具，通过 HTTP API 管理服务器、玩家、掉落、商城等",
         header = "通过 HTTP API 远程管理游戏服务端：启停服务、查询数据、修改配置、发放道具等。",
-        footerHeading = "快速开始 / 批量查询",
+        footerHeading = "快速开始 / 批量查询（推荐）",
         footer = {
                 "  配置: beidou config --server <url> --username <user> --password <pass>",
                 "  查看: beidou apis [keyword]   # 查可用 API",
-                "  单次: beidou call GET /server/v1/online",
-                "  批量: echo 'GET /x  POST /y {\"k\":1}' | beidou batch",
-                "  批量可合并多次查询，一次 Bash 调用全返回，避免 AI 反复调 CLI。",
+                "  多个请求务必用 batch，一次 Bash 调用全返回，避免反复确认：",
+                "     echo 'GET /x  POST /y {\"k\":1}' | beidou batch",
+                "  单个请求: beidou call GET /server/v1/online",
         },
         subcommands = {
                 Main.ConfigCommand.class,
@@ -164,7 +164,7 @@ public class Main implements Callable<Integer> {
         }
     }
 
-    @Command(name = "call", description = "调用服务端 API，先运行 beidou apis 查看可用接口")
+    @Command(name = "call", description = "调用单个 API。多个请求务必用 beidou batch 合并，避免重复权限确认！")
     static class CallCommand implements Callable<Integer> {
 
         @Option(names = {"-h", "--help"}, usageHelp = true, description = "显示帮助信息")

@@ -14,14 +14,16 @@ Move-Item -Force $Tmp "$InstallDir\beidou.exe"
 Write-Host "[OK] Installed to $InstallDir\beidou.exe"
 
 # Auto-add to user PATH
-$RegPath = "HKCU:\Environment"
-$Current = (Get-ItemProperty -Path $RegPath -Name PATH -ErrorAction SilentlyContinue).PATH
+$Current = [Environment]::GetEnvironmentVariable("PATH", "User")
 if ($Current -notlike "*$InstallDir*") {
     $NewPath = if ($Current) { "$Current;$InstallDir" } else { $InstallDir }
-    Set-ItemProperty -Path $RegPath -Name PATH -Value $NewPath
+    [Environment]::SetEnvironmentVariable("PATH", $NewPath, "User")
     Write-Host "[OK] Added to user PATH"
 }
 
+# Refresh PATH in current session
+$env:Path = [Environment]::GetEnvironmentVariable("PATH", "User") + ";" + [Environment]::GetEnvironmentVariable("PATH", "Machine")
+
 Write-Host ""
-Write-Host "Done. Restart your terminal and run 'beidou --help'."
+Write-Host "Done. Run 'beidou --help' to verify."
 Write-Host "============================================================"
