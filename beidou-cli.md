@@ -19,6 +19,20 @@ POST /drop/v1/getDropList {"pageNum":1,"pageSize":10}
 ' | beidou batch               # multiple calls in one shell invocation
 ```
 
+## Command Reference
+
+| Command | Description |
+|---------|-------------|
+| `beidou config` | Configure server connection (or `--show` to view) |
+| `beidou config --server <url> --username <user> --password <pass>` | Set credentials |
+| `beidou login` | Force re-login to refresh the JWT token |
+| `beidou version` | Show CLI version |
+| `beidou apis [keyword]` | List all 76 API endpoints, optional keyword filter |
+| `beidou call <METHOD> <path> [body] [--force]` | Call a single API |
+| `beidou batch` | Execute multiple API calls from stdin, one per line |
+| `beidou update` | Download and install the latest version |
+| `beidou uninstall` | Remove the binary and clean up PATH |
+
 ## Platform Quick Reference
 
 | OS | Shell | Path Prefix | Batch Chaining |
@@ -41,7 +55,7 @@ Credentials are saved to `~/.beidou-cli/config.json`. No manual login needed —
 
 ### 2. Discover APIs
 ```bash
-beidou apis               # all 55+ endpoints
+beidou apis               # all 76 endpoints
 beidou apis server        # filter by keyword: only server-related APIs
 beidou apis drop          # drop/rate related APIs
 ```
@@ -71,6 +85,13 @@ POST /character/v1/online/list {"pageNum":1,"pageSize":5}
 
 # Method B: && chain
 beidou call GET /server/v1/online && beidou call GET /server/v1/version
+```
+
+## Maintaining the CLI
+
+```bash
+beidou update       # upgrade to the latest release
+beidou uninstall    # remove beidou from the system
 ```
 
 ## Important Conventions
