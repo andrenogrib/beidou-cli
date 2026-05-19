@@ -14,7 +14,7 @@ import java.util.concurrent.Callable;
 
 @Command(
         name = "beidou",
-        version = "1.0.0",
+        versionProvider = Main.VersionProvider.class,
         description = "BeiDou-Server 游戏服务端管理工具，通过 HTTP API 管理服务器、玩家、掉落、商城等",
         header = "通过 HTTP API 远程管理游戏服务端：启停服务、查询数据、修改配置、发放道具等。",
         footerHeading = "快速开始 / 批量查询",
@@ -155,7 +155,7 @@ public class Main implements Callable<Integer> {
 
         @Override
         public Integer call() {
-            System.out.println("beidou 1.0.0");
+            System.out.println("beidou " + readVersion());
             return 0;
         }
     }
@@ -217,6 +217,20 @@ public class Main implements Callable<Integer> {
             client.call(method, path, body);
             return 0;
         }
+    }
+
+    static class VersionProvider implements CommandLine.IVersionProvider {
+        @Override
+        public String[] getVersion() {
+            return new String[] { readVersion() };
+        }
+    }
+
+    static String readVersion() {
+        try (var in = Main.class.getResourceAsStream("/version.txt")) {
+            if (in != null) return new String(in.readAllBytes(), StandardCharsets.UTF_8).trim();
+        } catch (Exception ignored) {}
+        return "dev";
     }
 
     public static void main(String[] args) {

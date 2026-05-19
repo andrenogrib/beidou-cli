@@ -1,13 +1,39 @@
 name: Build and Release
 
 on:
-  push:
-    branches: [master]
-    tags: ['v*']
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
+  version:
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.bump.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Bump version
+        id: bump
+        run: |
+          LATEST=$(git tag -l 'v*' --sort=-v:refname | head -1)
+          if [ -z "$LATEST" ]; then
+            NEW="v1.0.0"
+          else
+            # bump patch: v1.0.3 → v1.0.4
+            BASE="${LATEST%.*}"   # v1.0
+            PATCH="${LATEST##*.}" # 3
+            NEW="${BASE}.$((PATCH + 1))"
+          fi
+          echo "tag=$NEW" >> $GITHUB_OUTPUT
+          git tag "$NEW"
+          git push origin "$NEW"
+
   build:
+    needs: version
     name: ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
@@ -22,6 +48,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.version.outputs.tag }}
 
       - name: Set up GraalVM JDK 21
         uses: graalvm/setup-graalvm@v1
@@ -31,7 +59,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build native image
-        run: mvn package -DskipTests -Pnative
+        run: mvn package -DskipTests -Pnative -Dbeidou.version=${{ needs.version.outputs.tag }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -42,7 +70,6 @@ jobs:
   release:
     needs: build
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/')
     steps:
       - uses: actions/download-artifact@v4
         with:
@@ -57,12 +84,11 @@ jobs:
           cp dist/beidou-Windows-*/beidou.exe  release/beidou-windows.exe
           cp dist/beidou-macOS-*/beidou        release/beidou-macos
 
-      - name: Update latest release
+      - name: Create release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: latest
+          tag_name: ${{ needs.version.outputs.tag }}
           files: release/*
-          prerelease: false
           make_latest: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
