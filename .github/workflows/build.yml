@@ -53,9 +53,9 @@ jobs:
       - name: Rename binaries for release
         run: |
           mkdir -p release
-          cp dist/beidou-Linux-X64/beidou        release/beidou-linux
-          cp dist/beidou-Windows-X64/beidou.exe   release/beidou-windows.exe
-          cp dist/beidou-macOS-X64/beidou         release/beidou-macos
+          cp dist/beidou-Linux-*/beidou        release/beidou-linux
+          cp dist/beidou-Windows-*/beidou.exe  release/beidou-windows.exe
+          cp dist/beidou-macOS-*/beidou        release/beidou-macos
 
       - name: Update latest release
         uses: softprops/action-gh-release@v2
