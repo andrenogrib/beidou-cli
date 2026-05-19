@@ -7,7 +7,18 @@ Write-Host "============================================================"
 
 Write-Host "Downloading $Url ..."
 $Tmp = "$env:TEMP\beidou.exe"
-Invoke-WebRequest -Uri $Url -OutFile $Tmp
+
+try {
+    Invoke-WebRequest -Uri $Url -OutFile $Tmp -ErrorAction Stop
+} catch {
+    Write-Host "[FAIL] 下载失败: $($_.Exception.Message)"
+    exit 1
+}
+
+if (-not (Test-Path $Tmp)) {
+    Write-Host "[FAIL] 下载的文件不存在: $Tmp"
+    exit 1
+}
 
 New-Item -ItemType Directory -Force -Path $InstallDir | Out-Null
 Move-Item -Force $Tmp "$InstallDir\beidou.exe"
