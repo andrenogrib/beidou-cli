@@ -1,103 +1,105 @@
 # beidou
 
-BeiDou-Server 游戏服务端命令行管理工具，AI agent 通过 HTTP API 远程启停服务、查询数据、修改配置、发放道具等。
+Command-line management tool for BeiDou-Server. Lets an AI agent remotely start/stop the service, query data, change configuration, grant items, and more through the HTTP API.
 
-## 安装
+> A Chinese version of this document is available at [zh/README.md](zh/README.md).
 
-> **国内用户推荐**使用 `install-cn` 脚本，通过 `ghproxy.net` 代理加速 GitHub 下载。
+## Installation
+
+> **Users in mainland China** should prefer the `install-cn` script, which uses the `ghproxy.net` mirror to speed up GitHub downloads.
 
 ### macOS / Linux
 
 ```bash
-# 国内推荐（ghproxy 代理加速）
+# Recommended in mainland China (ghproxy mirror acceleration)
 curl -fsSL https://raw.githubusercontent.com/BeiDouMS/beidou-cli/master/install-cn.sh | bash
 
-# 直连 GitHub
+# Direct GitHub connection
 curl -fsSL https://raw.githubusercontent.com/BeiDouMS/beidou-cli/master/install.sh | bash
 ```
 
-安装到 `~/.local/bin/beidou`，自动写入 `~/.bashrc` / `~/.zshrc`。
+Installs to `~/.local/bin/beidou` and automatically updates `~/.bashrc` / `~/.zshrc`.
 
 ### Windows
 
 ```powershell
-# 国内推荐（ghproxy 代理加速）
+# Recommended in mainland China (ghproxy mirror acceleration)
 irm https://raw.githubusercontent.com/BeiDouMS/beidou-cli/master/install-cn.ps1 | iex
 
-# 直连 GitHub
+# Direct GitHub connection
 irm https://raw.githubusercontent.com/BeiDouMS/beidou-cli/master/install.ps1 | iex
 ```
 
-安装并自动加入用户 PATH，重启终端即可使用。
+Installs and automatically adds itself to the user PATH; restart the terminal to start using it.
 
-### 更新
+### Update
 
 ```bash
-beidou update    # 自动下载最新版覆盖当前二进制
+beidou update    # automatically downloads the latest version and overwrites the current binary
 ```
 
-如需卸载：
+To uninstall:
 
 ```bash
-beidou uninstall  # 删除二进制并清理 PATH
+beidou uninstall  # removes the binary and cleans up PATH
 ```
 
-### 手动下载
+### Manual download
 
-从 [Releases](https://github.com/BeiDouMS/beidou-cli/releases/latest) 页面下载对应平台的二进制。
+Download the binary for your platform from the [Releases](https://github.com/BeiDouMS/beidou-cli/releases/latest) page.
 
-## 快速开始
+## Quick Start
 
 ```bash
-# 1. 配置服务端连接（一次就行）
+# 1. Configure the server connection (only needed once)
 beidou config --server http://localhost:8686 --username admin --password 123456
 
-# 2. 查看可用 API
+# 2. List available APIs
 beidou apis
 
-# 3. 测试连通性
+# 3. Test connectivity
 beidou call GET /server/v1/online
 ```
 
-## AI Agent 使用指南
+## AI Agent Guide
 
-### 安装 Skill
+### Installing the Skill
 
-beidou-cli 提供了 skill 文件，AI agent 应将其下载并注册为 skill/工具，而非仅作为参考文档。
+beidou-cli ships a skill file. An AI agent should download and register it as a skill/tool rather than treating it as reference documentation only.
 
-**Skill 文件地址：**
+**Skill file URL:**
 
 ```
 https://raw.githubusercontent.com/BeiDouMS/beidou-cli/master/beidou-cli.md
 ```
 
-**通用安装方式：**
+**Generic installation:**
 
-1. 下载上述 URL 对应的文件
-2. 按你的 agent 平台要求注册为 skill（如放到 skills 目录、注册为自定义命令等）
+1. Download the file at the URL above.
+2. Register it as a skill according to your agent platform's requirements (e.g., place it in the skills directory, register it as a custom command, etc.).
 
-**Claude Code 用户：**
+**Claude Code users:**
 
-将文件放到 `~/.claude/commands/`（全局，推荐）或 `<project>/.claude/commands/`（仅当前项目）目录下，即可通过 `/beidou-cli` 指令直接调用。
+Put the file in `~/.claude/commands/` (global, recommended) or `<project>/.claude/commands/` (current project only), and you can invoke it directly with the `/beidou-cli` command.
 
-### 安装 beidou CLI 二进制
+### Installing the beidou CLI binary
 
-如果你已经安装了 beidou CLI 二进制，按以下顺序操作：
+If you have already installed the beidou CLI binary, proceed in this order:
 
 ```bash
-# 第一步：确认 CLI 可用（二进制在 PATH 中）
+# Step 1: Confirm the CLI is available (binary on PATH)
 beidou version
 
-# 第二步：让用户提供配置，或执行
+# Step 2: Have the user provide configuration, or run
 beidou config --server <url> --username <user> --password <pass>
 
-# 第三步：查看全部可用接口
+# Step 3: List all available endpoints
 beidou apis
 
-# 第四步：调用 API（单次）
+# Step 4: Call an API (single call)
 beidou call GET /server/v1/online
 
-# 批量查询（一次 shell 调用全返回，减少交互）
+# Batch query (all results returned in one shell invocation, fewer round trips)
 echo '
 GET /server/v1/online
 GET /server/v1/version
@@ -105,24 +107,24 @@ POST /character/v1/online/list {"pageNum":1,"pageSize":10}
 ' | beidou batch
 ```
 
-**注意事项：**
-- Git Bash（Windows）下路径参数会被 MSYS 自动转换，beidou 会自动修复。如遇问题加 `MSYS_NO_PATHCONV=1`
-- 敏感操作（关服、删除、修改数据）默认拦截，需加 `--force`
-- 成功码是 `20000`（不是 HTTP 200），别误判失败
-- 首次 `call` 自动登录获取 token，无需手动 `beidou login`
-- 非交互环境下 `beidou config` 会报错提示用命令行参数
+**Notes:**
+- Under Git Bash (Windows), path arguments are auto-converted by MSYS; beidou fixes this automatically. If you still hit problems, add `MSYS_NO_PATHCONV=1`.
+- Sensitive operations (shutdown, delete, modify data) are blocked by default and require `--force`.
+- The success code is `20000` (not HTTP 200) — don't mistake it for a failure.
+- The first `call` logs in automatically to obtain a token; no manual `beidou login` is needed.
+- In a non-interactive environment, `beidou config` errors out and tells you to use command-line arguments.
 
-## 构建
+## Build
 
-如需从源码构建：
+To build from source:
 
 ```bash
 # JAR
 mvn package -DskipTests
 
-# 原生二进制（需要 GraalVM JDK 21 + native-image）
-# Linux/macOS: 需要 GCC/Xcode
-# Windows: 需要 Visual Studio 2022+ 含 C++ 桌面开发
+# Native binary (requires GraalVM JDK 21 + native-image)
+# Linux/macOS: requires GCC/Xcode
+# Windows: requires Visual Studio 2022+ with C++ desktop development
 ./build-native.sh  # macOS/Linux
 build-native.bat   # Windows
 ```

@@ -7,8 +7,6 @@ description: Use the beidou CLI to interact with BeiDou-Server via HTTP API. ALW
 
 `beidou` is a CLI tool for managing BeiDou-Server through HTTP API.
 
-> A Chinese backup of this document is available at [zh/beidou-cli.md](zh/beidou-cli.md).
-
 **GOLDEN RULE: When you need 2 or more API calls, combine them with `echo '...' | beidou batch`. Each separate `beidou call` triggers its own permission prompt. Batch = one prompt for all.**
 
 ## If `beidou` Is Not Installed
@@ -87,7 +85,7 @@ beidou apis               # all 76 endpoints
 beidou apis server        # filter by keyword: only server-related APIs
 beidou apis drop          # drop/rate related APIs
 ```
-Each entry shows: HTTP method, path, description, and a `[敏感]` (sensitive) marker if it needs `--force`. Note: the CLI prints this marker literally as `[敏感]`.
+Each entry shows: HTTP method, path, description, and `[敏感]` marker if it needs `--force`.
 
 ### 3. Call APIs
 
@@ -127,13 +125,13 @@ beidou uninstall    # remove beidou from the system
 - **Success code is 20000** (NOT HTTP 200). The server uses `BizExceptionEnum.SUCCESS = 20000`.
 - **`/auth/**` paths are auth-free** — no token needed. `call POST /auth/v1/login` works without prior login.
 - **Auto-wrap**: POST/PUT bodies are auto-wrapped in `{"data": <body>}`. You send the inner payload directly.
-- **Config first**: If `beidou call` says `未配置` ("not configured"), run `beidou config` with server/username/password.
+- **Config first**: If `beidou call` says "未配置", run `beidou config` with server/username/password.
 - **Token auto-refresh**: The CLI caches JWT tokens. Expired tokens are auto-refreshed. No manual `beidou login` needed unless forced.
 
 ## Common Pitfalls
 
-1. **`登录失败: 成功!`** ("login failed: Success!") → The success code check was wrong (fixed). If you see this, update the CLI binary.
+1. **"登录失败: 成功!"** → The success code check was wrong (fixed). If you see this, update the CLI binary.
 2. **`NoSuchElementException`** → You ran `beidou config` without stdin. Use `beidou config --server ... --username ... --password ...` in non-interactive mode.
 3. **`Unknown option: '--help'` on subcommand** → Now fixed. All subcommands support `--help`.
-4. **API 40000 `请求的数据格式不符`** ("request data format does not match") → The JSON body probably uses wrong field names. Check with `beidou apis <keyword>` for the correct format.
+4. **API 40000 "请求的数据格式不符"** → The JSON body probably uses wrong field names. Check with `beidou apis <keyword>` for the correct format.
 5. **Git Bash path corruption** → The CLI auto-fixes MSYS-converted paths. If broken, add `MSYS_NO_PATHCONV=1`.
